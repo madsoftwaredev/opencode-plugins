@@ -1,0 +1,47 @@
+# Publishes every package in packages/ to npm.
+#
+# Auth is npm Trusted Publishing (OIDC): no long-lived token in this repository.
+# Configure each package once on npmjs.com -> package -> Settings -> Trusted
+# Publisher -> GitHub Actions, pointing at this repository and this workflow.
+#
+# The very first release of each package cannot use trusted publishing (the
+# package does not exist on npm yet), so publish v0.1.0 locally once after
+# `npm login`. Every release after that runs here tokenless.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Verify before publish
+        run: |
+          bun run build:check
+          bun test ./packages
+
+      - name: Publish
+        run: |
+          for dir in packages/*/; do
+            echo "==> publishing $dir"
+            npm publish --access public --provenance "$dir"
+          done

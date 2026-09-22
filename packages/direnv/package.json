@@ -1,0 +1,41 @@
+{
+  "name": "@madsoftwaredev/opencode-direnv",
+  "version": "0.1.0",
+  "description": "OpenCode V2 plugin that applies direnv environments to each shell command.",
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "direnv",
+    "environment",
+    "shell"
+  ],
+  "license": "MIT",
+  "author": "MadSoftwareDev",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "files": [
+    "index.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/madsoftwaredev/opencode-plugins.git",
+    "directory": "packages/direnv"
+  },
+  "homepage": "https://github.com/madsoftwaredev/opencode-plugins/tree/main/packages/direnv#readme",
+  "bugs": {
+    "url": "https://github.com/madsoftwaredev/opencode-plugins/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@opencode/plugin": "^2.0.12"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

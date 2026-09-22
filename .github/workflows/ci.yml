@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Build check
+        run: bun run build:check
+
+      - name: Test
+        run: bun test ./packages
+
+      - name: Pack dry run
+        run: |
+          for dir in packages/*/; do
+            echo "==> $dir"
+            npm pack --dry-run "$dir"
+          done

@@ -1,0 +1,42 @@
+{
+  "name": "@madsoftwaredev/opencode-lint-feedback",
+  "version": "0.1.0",
+  "description": "OpenCode V2 plugin that appends check-only project-local ESLint diagnostics after native edits.",
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "eslint",
+    "lint",
+    "diagnostics"
+  ],
+  "license": "MIT",
+  "author": "MadSoftwareDev",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "files": [
+    "index.ts",
+    "check.mjs",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/madsoftwaredev/opencode-plugins.git",
+    "directory": "packages/lint-feedback"
+  },
+  "homepage": "https://github.com/madsoftwaredev/opencode-plugins/tree/main/packages/lint-feedback#readme",
+  "bugs": {
+    "url": "https://github.com/madsoftwaredev/opencode-plugins/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@opencode/plugin": "^2.0.12"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

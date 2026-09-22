@@ -1,0 +1,9 @@
+{
+  "name": "lint-feedback-manual-fixture",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "eslint": "9.39.1",
+    "prettier": "3.6.2"
+  }
+}

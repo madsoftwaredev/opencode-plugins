@@ -1,0 +1,47 @@
+{
+  "name": "@madsoftwaredev/opencode-subagent-sidebar",
+  "version": "0.1.0",
+  "description": "OpenCode V2 TUI plugin that shows live child subagent sessions in the sidebar.",
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "subagent",
+    "sidebar",
+    "tui"
+  ],
+  "license": "MIT",
+  "author": "MadSoftwareDev",
+  "type": "module",
+  "exports": {
+    "./tui": "./tui.tsx"
+  },
+  "files": [
+    "tui.tsx",
+    "subagent-view.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/madsoftwaredev/opencode-plugins.git",
+    "directory": "packages/subagent-sidebar"
+  },
+  "homepage": "https://github.com/madsoftwaredev/opencode-plugins/tree/main/packages/subagent-sidebar#readme",
+  "bugs": {
+    "url": "https://github.com/madsoftwaredev/opencode-plugins/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@opencode/plugin": "^2.0.12"
+  },
+  "peerDependencies": {
+    "@opentui/core": ">=0.5.10",
+    "@opentui/solid": ">=0.5.10",
+    "solid-js": ">=1.9.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "name": "opencode-plugins",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OpenCode V2 plugins by MadSoftwareDev.",
+  "license": "MIT",
+  "author": "MadSoftwareDev",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/madsoftwaredev/opencode-plugins.git"
+  },
+  "homepage": "https://github.com/madsoftwaredev/opencode-plugins#readme",
+  "bugs": {
+    "url": "https://github.com/madsoftwaredev/opencode-plugins/issues"
+  },
+  "scripts": {
+    "test": "bun test ./packages",
+    "build:check": "bash ./scripts/build-check.sh",
+    "check": "bun run build:check && bun test ./packages"
+  },
+  "devDependencies": {
+    "@opencode/plugin": "^2.0.12",
+    "@opencode/theme": "2.0.12",
+    "@opentui/core": "^0.5.10",
+    "@opentui/solid": "^0.5.10",
+    "solid-js": "^1.9.0",
+    "typescript": "^5.8.0"
+  }
+}

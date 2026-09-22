@@ -1,0 +1,40 @@
+{
+  "name": "@madsoftwaredev/opencode-background-subagent",
+  "version": "0.1.0",
+  "description": "OpenCode V2 plugin that makes omitted subagent.background calls run in the background.",
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "subagent",
+    "background"
+  ],
+  "license": "MIT",
+  "author": "MadSoftwareDev",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "files": [
+    "index.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/madsoftwaredev/opencode-plugins.git",
+    "directory": "packages/background-subagent"
+  },
+  "homepage": "https://github.com/madsoftwaredev/opencode-plugins/tree/main/packages/background-subagent#readme",
+  "bugs": {
+    "url": "https://github.com/madsoftwaredev/opencode-plugins/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@opencode/plugin": "^2.0.12"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

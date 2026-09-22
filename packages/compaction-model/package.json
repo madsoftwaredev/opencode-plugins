@@ -1,0 +1,42 @@
+{
+  "name": "@madsoftwaredev/opencode-compaction-model",
+  "version": "0.1.0",
+  "description": "OpenCode V2 plugin that summarizes checkpoints with a dedicated compaction model and variant.",
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "compaction",
+    "context",
+    "model"
+  ],
+  "license": "MIT",
+  "author": "MadSoftwareDev",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "files": [
+    "index.ts",
+    "go.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/madsoftwaredev/opencode-plugins.git",
+    "directory": "packages/compaction-model"
+  },
+  "homepage": "https://github.com/madsoftwaredev/opencode-plugins/tree/main/packages/compaction-model#readme",
+  "bugs": {
+    "url": "https://github.com/madsoftwaredev/opencode-plugins/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@opencode/plugin": "^2.0.12"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
