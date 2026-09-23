@@ -24,6 +24,9 @@ Server entrypoints export `.`. TUI-only plugins export `./tui`, matching the
 [CLI plugin layout](https://opencode.ai/v2/docs/build/plugins/cli) OpenCode loads
 automatically.
 
+Choose the compaction model and reasoning variant with `options.model` in
+`opencode.json`; see the [compaction configuration example](packages/compaction-model#choose-the-compaction-model).
+
 ## Development
 
 ```sh
@@ -61,12 +64,12 @@ Trusted publishing cannot cover a package that does not exist on npm yet, so
 publish the first version from a machine with an npm session:
 
 ```sh
-npm publish --access public packages/background-subagent
-npm publish --access public packages/subagent-sidebar
-npm publish --access public packages/lint-feedback
-npm publish --access public packages/direnv
-npm publish --access public packages/compaction-model
-npm publish --access public packages/btw
+npm publish --access public ./packages/background-subagent
+npm publish --access public ./packages/subagent-sidebar
+npm publish --access public ./packages/lint-feedback
+npm publish --access public ./packages/direnv
+npm publish --access public ./packages/compaction-model
+npm publish --access public ./packages/btw
 ```
 
 ### Every release after that (GitHub Actions)

@@ -1,11 +1,45 @@
 # @madsoftwaredev/opencode-compaction-model
 
+Summarizes local checkpoint compaction with a dedicated model and variant while
+the session keeps its selected working model.
+
 ```sh
 opencode plugin add @madsoftwaredev/opencode-compaction-model
 ```
 
-Summarizes local checkpoint compaction with a dedicated model and variant while
-the session keeps its selected working model.
+## Choose the compaction model
+
+Set `options.model` in your global `~/.config/opencode/opencode.json` or your
+project's `opencode.json` (JSONC also works). If the CLI already added a string
+entry for this package, replace that entry with the object below, keeping your
+other plugins:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugins": [
+    {
+      "package": "@madsoftwaredev/opencode-compaction-model",
+      "options": {
+        "model": "deepseek/deepseek-flash#max"
+      }
+    }
+  ]
+}
+```
+
+Use `provider/model#variant`, with `#variant` optional. Choose an enabled model
+and supported reasoning variant from `/models`, using a provider connected in
+OpenCode. The example selects direct DeepSeek; you can select another provider
+and model the same way. Omitting `#variant` uses that model's default settings.
+
+When model options are omitted, the default is
+`opencode-go/deepseek-v4.1-flash#max`, which requires an OpenCode Go connection.
+This default is overridable. The separate `providerID`, `modelID`, and `variant`
+options are also supported; a full `model` string takes precedence over them.
+
+There is no default character cutoff. Optional `maxTranscriptChars` is a guard:
+exceeding it logs a fallback rather than silently deleting the middle of the history.
 
 ## Why the Go adapter exists
 
@@ -53,27 +87,6 @@ The log does not include transcripts, summaries, credentials, or Go response bod
 - OpenCode owns automatic scheduling, recent-context retention, and checkpoint installation.
   The plugin handles requests delivered to the `compaction` hook; native provider checkpoint
   routes are outside this adapter's verification.
-
-## Options
-
-Optional entry in `opencode.json` (the default needs no config entry):
-
-```json
-{
-  "plugins": [
-    {
-      "package": "@madsoftwaredev/opencode-compaction-model",
-      "options": { "model": "opencode-go/deepseek-v4.1-flash#max" }
-    }
-  ]
-}
-```
-
-`model` accepts `provider/model#variant` (variant optional). The earlier separate
-`providerID`, `modelID`, and `variant` options remain supported.
-
-There is no default character cutoff. Optional `maxTranscriptChars` is now a guard:
-exceeding it logs a fallback rather than silently deleting the middle of the history.
 
 ## Verification
 
