@@ -18,6 +18,11 @@ jobs:
         with:
           bun-version: latest
 
+      - name: Install direnv for integration tests
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes direnv
+
       - name: Install
         run: bun install --frozen-lockfile
 
@@ -29,7 +34,7 @@ jobs:
 
       - name: Pack dry run
         run: |
-          for dir in packages/*/; do
+          for dir in ./packages/*/; do
             echo "==> $dir"
             npm pack --dry-run "$dir"
           done
