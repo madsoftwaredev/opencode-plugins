@@ -53,6 +53,18 @@
         "@opencode/plugin": "^2.0.12",
       },
     },
+    "packages/stats": {
+      "name": "@madsoftwaredev/opencode-stats",
+      "version": "0.1.0",
+      "dependencies": {
+        "@opencode/plugin": "^2.0.12",
+      },
+      "peerDependencies": {
+        "@opentui/core": ">=0.5.10",
+        "@opentui/solid": ">=0.5.10",
+        "solid-js": ">=1.9.0",
+      },
+    },
     "packages/subagent-sidebar": {
       "name": "@madsoftwaredev/opencode-subagent-sidebar",
       "version": "0.1.0",
@@ -206,6 +218,8 @@
     "@madsoftwaredev/opencode-direnv": ["@madsoftwaredev/opencode-direnv@workspace:packages/direnv"],
 
     "@madsoftwaredev/opencode-lint-feedback": ["@madsoftwaredev/opencode-lint-feedback@workspace:packages/lint-feedback"],
+
+    "@madsoftwaredev/opencode-stats": ["@madsoftwaredev/opencode-stats@workspace:packages/stats"],
 
     "@madsoftwaredev/opencode-subagent-sidebar": ["@madsoftwaredev/opencode-subagent-sidebar@workspace:packages/subagent-sidebar"],
 

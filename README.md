@@ -8,7 +8,7 @@ environment and context.
 [![npm: background-subagent](https://img.shields.io/npm/v/@madsoftwaredev/opencode-background-subagent)](https://www.npmjs.com/package/@madsoftwaredev/opencode-background-subagent)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Six independent packages from MAD Software. Install just the ones that fit your workflow.
+Seven independent packages from MAD Software. Install just the ones that fit your workflow.
 
 ## Plugins
 
@@ -16,12 +16,13 @@ Six independent packages from MAD Software. Install just the ones that fit your 
 | --- | --- | --- |
 | [Background subagent](packages/background-subagent/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-background-subagent) | Server | Runs subagents in the background when `background` is omitted. Explicit foreground calls still work. |
 | [Subagent sidebar](packages/subagent-sidebar/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-subagent-sidebar) | TUI | Shows live child sessions, their status and activity; click to open, expand to see more. |
+| [Stats](packages/stats/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-stats) | TUI | Shows token speed and session-wide turn and step counts in the prompt footer; toggle each in the TUI. |
 | [Lint feedback](packages/lint-feedback/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-lint-feedback) | Server | Appends project-local ESLint diagnostics after successful edits. Checks only; it does not fix files. |
 | [direnv](packages/direnv/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-direnv) | Server | Applies the approved environment for the shell command's working directory. |
 | [Compaction model](packages/compaction-model/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-compaction-model) | Server | Summarizes checkpoints with a selectable model and reasoning variant. |
 | [`/btw`](packages/btw/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-btw) | TUI | Runs a side conversation in a background fork of the current session. |
 
-All six packages are published at **`0.1.0`** under [`@madsoftwaredev`](https://www.npmjs.com/org/madsoftwaredev).
+All seven packages are published at **`0.1.0`** under [`@madsoftwaredev`](https://www.npmjs.com/org/madsoftwaredev).
 
 ## Install
 
@@ -36,11 +37,12 @@ opencode plugin add @madsoftwaredev/opencode-compaction-model
 
 # TUI plugins — registered in cli.json
 opencode plugin add @madsoftwaredev/opencode-subagent-sidebar
+opencode plugin add @madsoftwaredev/opencode-stats
 opencode plugin add @madsoftwaredev/opencode-btw
 ```
 
 You can also install a single package by copying just its command from above.
-Restart the OpenCode TUI after installing either TUI plugin. To manage packages:
+Restart the OpenCode TUI after installing a TUI plugin. To manage packages:
 
 ```sh
 opencode plugin list
@@ -82,7 +84,7 @@ for details and a working configuration example.
   project's `.envrc` and approve it with `direnv allow`.
 - **Lint feedback:** requires Node on the shell's `PATH`, project-installed
   ESLint 9 or 10, and a flat `eslint.config.*` file.
-- **Subagent sidebar** and **`/btw`:** require the OpenCode terminal UI.
+- **Subagent sidebar**, **stats**, and **`/btw`:** require the OpenCode terminal UI.
 
 Each plugin README documents its behavior, setup, and limitations.
 
@@ -113,7 +115,7 @@ Issues and ideas are welcome in the [GitHub issue tracker](https://github.com/ma
 <details>
 <summary>Maintainers: publishing releases</summary>
 
-All six packages share one version. To prepare a release, update `version` in
+All seven packages share one version. To prepare a release, update `version` in
 the root manifest and each `packages/*/package.json`, refresh the lockfile, and
 run the checks:
 

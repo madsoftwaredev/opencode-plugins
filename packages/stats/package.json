@@ -1,0 +1,48 @@
+{
+  "name": "@madsoftwaredev/opencode-stats",
+  "version": "0.1.0",
+  "description": "OpenCode V2 TUI plugin for token speed and session-wide turn and step counts.",
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "stats",
+    "tokens",
+    "turns",
+    "tui"
+  ],
+  "license": "MIT",
+  "author": "MAD Software",
+  "type": "module",
+  "exports": {
+    "./tui": "./tui.tsx"
+  },
+  "files": [
+    "tui.tsx",
+    "stats.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/madsoftwaredev/opencode-plugins.git",
+    "directory": "packages/stats"
+  },
+  "homepage": "https://github.com/madsoftwaredev/opencode-plugins/tree/main/packages/stats#readme",
+  "bugs": {
+    "url": "https://github.com/madsoftwaredev/opencode-plugins/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@opencode/plugin": "^2.0.12"
+  },
+  "peerDependencies": {
+    "@opentui/core": ">=0.5.10",
+    "@opentui/solid": ">=0.5.10",
+    "solid-js": ">=1.9.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
