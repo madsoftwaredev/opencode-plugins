@@ -4,7 +4,7 @@
 opencode plugin add @madsoftwaredev/opencode-lint-feedback
 ```
 
-`local.lint-feedback` appends project-local ESLint diagnostics to successful native
+`lint-feedback` appends project-local ESLint diagnostics to successful native
 `write`, `edit`, and `patch` results. It runs **checks only**, after native formatting;
 it does not fix files, install packages, supply rules, or run repository-wide lint
 or typechecks. Use the existing `/lint` command for safe corrections and re-checks.
@@ -90,7 +90,7 @@ opencode api post /api/location/reload
 opencode api get /api/plugin
 ```
 
-Look for `local.lint-feedback`. A service restart is not required. Formatting
+Look for `lint-feedback`. A service restart is not required. Formatting
 changes are global; the check only runs where the project already provides
 supported ESLint configuration.
 

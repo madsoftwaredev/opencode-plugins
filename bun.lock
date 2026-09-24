@@ -15,14 +15,14 @@
     },
     "packages/background-subagent": {
       "name": "@madsoftwaredev/opencode-background-subagent",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@opencode/plugin": "^2.0.12",
       },
     },
     "packages/btw": {
       "name": "@madsoftwaredev/opencode-btw",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@opencode/plugin": "^2.0.12",
       },
@@ -34,28 +34,28 @@
     },
     "packages/compaction-model": {
       "name": "@madsoftwaredev/opencode-compaction-model",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@opencode/plugin": "^2.0.12",
       },
     },
     "packages/direnv": {
       "name": "@madsoftwaredev/opencode-direnv",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@opencode/plugin": "^2.0.12",
       },
     },
     "packages/lint-feedback": {
       "name": "@madsoftwaredev/opencode-lint-feedback",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@opencode/plugin": "^2.0.12",
       },
     },
     "packages/stats": {
       "name": "@madsoftwaredev/opencode-stats",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@opencode/plugin": "^2.0.12",
       },
@@ -67,7 +67,7 @@
     },
     "packages/subagent-sidebar": {
       "name": "@madsoftwaredev/opencode-subagent-sidebar",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@opencode/plugin": "^2.0.12",
       },

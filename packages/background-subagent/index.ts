@@ -14,7 +14,7 @@ const guidance =
   "\n\nBackground is the default. Set `background: false` only when the parent must receive the result before continuing.";
 
 export default {
-  id: "local.background-subagent",
+  id: "background-subagent",
   async setup(ctx) {
     await ctx.tool.transform((editor) => {
       editor.update("subagent", (tool) => {

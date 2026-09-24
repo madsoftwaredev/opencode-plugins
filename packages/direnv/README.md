@@ -5,7 +5,7 @@ opencode plugin add @madsoftwaredev/opencode-direnv
 ```
 
 Loads the command's direnv environment through V2's `shell.create.before` hook.
-The active plugin ID is `local.direnv`.
+The active plugin ID is `direnv`.
 
 Requires `direnv` on the OpenCode service's PATH and an approved `.envrc`:
 

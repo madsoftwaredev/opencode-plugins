@@ -206,7 +206,7 @@ function syncChildren(context: Context, sessionID: string, state: SyncState): vo
 }
 
 export default Plugin.define({
-  id: "local.subagent-sidebar",
+  id: "subagent-sidebar",
   setup(context) {
     let disposed = false
     const syncState: SyncState = {

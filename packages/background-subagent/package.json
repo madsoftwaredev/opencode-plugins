@@ -1,6 +1,6 @@
 {
   "name": "@madsoftwaredev/opencode-background-subagent",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OpenCode V2 plugin that makes omitted subagent.background calls run in the background.",
   "keywords": [
     "opencode",

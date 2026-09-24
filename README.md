@@ -22,7 +22,10 @@ Seven independent packages from MAD Software. Install just the ones that fit you
 | [Compaction model](packages/compaction-model/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-compaction-model) | Server | Summarizes checkpoints with a selectable model and reasoning variant. |
 | [`/btw`](packages/btw/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-btw) | TUI | Runs a side conversation in a background fork of the current session. |
 
-All seven packages are published at **`0.1.0`** under [`@madsoftwaredev`](https://www.npmjs.com/org/madsoftwaredev).
+All seven packages are published at **`0.1.1`** under [`@madsoftwaredev`](https://www.npmjs.com/org/madsoftwaredev).
+In `0.1.1`, background-subagent, subagent-sidebar, lint-feedback, and direnv
+drop `local.` from their active plugin IDs. Update any config rules that refer
+to the old IDs; npm package names have not changed.
 
 ## Install
 
@@ -126,13 +129,13 @@ npm pack --workspaces --dry-run
 ```
 
 Commit the version bump and push a matching tag. For example, after changing
-every package to `0.1.1`:
+every package to `0.1.2`:
 
 ```sh
 git add package.json packages/*/package.json bun.lock
-git commit -m "release: v0.1.1"
-git tag v0.1.1
-git push origin main v0.1.1
+git commit -m "release: v0.1.2"
+git tag v0.1.2
+git push origin main v0.1.2
 ```
 
 The [release workflow](.github/workflows/release.yml) verifies the packages and

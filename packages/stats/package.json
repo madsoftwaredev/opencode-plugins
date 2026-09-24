@@ -1,6 +1,6 @@
 {
   "name": "@madsoftwaredev/opencode-stats",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OpenCode V2 TUI plugin for token speed and session-wide turn and step counts.",
   "keywords": [
     "opencode",

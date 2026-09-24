@@ -97,7 +97,7 @@ function shellFeedback(result: Result): string {
 }
 
 export default {
-  id: "local.lint-feedback",
+  id: "lint-feedback",
   async setup(ctx) {
     await ctx.tool.transform((editor) => {
       // Captured per registry snapshot. Do not call ctx.shell.create or spawn here:

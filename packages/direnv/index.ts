@@ -5,7 +5,7 @@ import { promisify } from "node:util";
 const execFileAsync = promisify(execFile);
 
 export default {
-  id: "local.direnv",
+  id: "direnv",
   async setup(ctx) {
     await ctx.shell.hook("create.before", async (event) => {
       let stdout: string;
