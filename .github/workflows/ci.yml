@@ -30,7 +30,7 @@ jobs:
         run: bun run build:check
 
       - name: Test
-        run: bun test ./packages
+        run: bun test ./packages ./scripts
 
       - name: Pack dry run
         run: |

@@ -19,8 +19,10 @@
   },
   "scripts": {
     "test": "bun test ./packages",
+    "test:release": "bun test ./scripts",
     "build:check": "bash ./scripts/build-check.sh",
-    "check": "bun run build:check && bun test ./packages"
+    "check": "bun run build:check && bun test ./packages ./scripts",
+    "release:plan": "bun scripts/publish.ts"
   },
   "devDependencies": {
     "@opencode/plugin": "^2.0.12",

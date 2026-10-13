@@ -1,4 +1,10 @@
-# Publishes every package in packages/ to npm.
+# Publishes the one package named by the pushed release tag.
+#
+# Tag format: <package-directory>@<version>, for example stats@0.1.3. Only that
+# package is published, so a version bump in one package never waits on a
+# sibling's version or forces every package to move together. The tag's version
+# is checked against packages/<directory>/package.json and against the registry,
+# so pushing the same tag twice publishes once and then skips.
 #
 # Auth is npm Trusted Publishing (OIDC): no long-lived token in this repository.
 # Configure each package once on npmjs.com -> package -> Settings -> Trusted
@@ -11,17 +17,40 @@ name: Release
 
 on:
   push:
-    tags: ["v*"]
+    tags: ["*@*"]
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    concurrency:
+      group: release-${{ github.ref_name }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
+
+      - name: Read the release tag
+        id: tag
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          dir="${TAG%@*}"
+          version="${TAG##*@}"
+          if [[ ! "${dir}" =~ ^[a-z0-9][a-z0-9-]*$ || ! "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "::error::Tag '${TAG}' is not <package-directory>@<version>."
+            exit 1
+          fi
+          if [[ ! -d "packages/${dir}" ]]; then
+            echo "::error::Tag '${TAG}' does not name a package under packages/."
+            exit 1
+          fi
+          echo "dir=${dir}" >> "$GITHUB_OUTPUT"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
 
       - uses: oven-sh/setup-bun@v2
         with:
@@ -45,11 +74,10 @@ jobs:
       - name: Verify before publish
         run: |
           bun run build:check
-          bun test ./packages
+          bun test ./packages ./scripts
 
-      - name: Publish
+      - name: Publish ${{ steps.tag.outputs.dir }}
         run: |
-          for dir in ./packages/*/; do
-            echo "==> publishing $dir"
-            npm publish --access public --provenance "$dir"
-          done
+          bun scripts/publish.ts "packages/${{ steps.tag.outputs.dir }}" \
+            --expected-version "${{ steps.tag.outputs.version }}" \
+            --provenance
