@@ -101,6 +101,9 @@ opencode plugin add @madsoftwaredev/opencode-btw
 
 Restart the OpenCode TUI after installing a TUI plugin.
 
+Each package has its own version line, so `opencode plugin update` moves only the
+packages that changed.
+
 <details>
 <summary><b>Managing installed packages</b></summary>
 
@@ -175,32 +178,40 @@ Issues and ideas are welcome in the [GitHub issue tracker](https://github.com/ma
 <details>
 <summary><b>Maintainers: Publishing Releases</b></summary>
 
-All seven packages share one version. To prepare a release, update `version` in
-the root manifest and each `packages/*/package.json`, refresh the lockfile, and
-run the checks:
+Each package versions and releases on its own. Decide the bump per package,
+then update only the manifests you changed and refresh the lockfile:
 
 ```sh
 bun install
 bun run check
-npm pack --workspaces --dry-run
 ```
 
-Commit the version bump and push a matching tag. For example, after changing
-every package to `0.1.2`:
+Preview what a tag would publish before pushing it (the planned version must
+already be in the manifest):
 
 ```sh
-git add package.json packages/*/package.json bun.lock
-git commit -m "release: v0.1.2"
-git tag v0.1.2
-git push origin main v0.1.2
+bun run release:plan packages/stats --expected-version 0.1.3 --dry-run
 ```
 
-The [release workflow](.github/workflows/release.yml) verifies the packages and
-publishes them with provenance. Configure npm Trusted Publishing for **each
-package** with GitHub organization `madsoftwaredev`, repository
-`opencode-plugins`, workflow filename `release.yml`, and direct `npm publish`
-enabled. Trusted Publishing requires Node.js 22.14.0+ and npm 11.5.1+ on the
-runner.
+Stage the version bumps, commit them, and push a tag named after the package
+directory. For example, after changing `stats` to `0.1.3`:
+
+```sh
+git add packages/stats/package.json bun.lock
+git commit -m "release: stats 0.1.3"
+git tag 'stats@0.1.3'
+git push origin main 'stats@0.1.3'
+```
+
+The [release workflow](.github/workflows/release.yml) verifies that package and
+publishes it with provenance; packages whose version did not change are not
+touched. A tag for an already-published version is a no-op, so a re-run is safe.
+Release more than one package by pushing one tag per package.
+
+Configure npm Trusted Publishing for **each package** with GitHub organization
+`madsoftwaredev`, repository `opencode-plugins`, workflow filename `release.yml`,
+and direct `npm publish` enabled. Trusted Publishing requires Node.js 22.14.0+
+and npm 11.5.1+ on the runner.
 
 </details>
 
