@@ -17,6 +17,7 @@
   },
   "files": [
     "tui.tsx",
+    "options.ts",
     "subagent-view.ts",
     "README.md",
     "LICENSE"
