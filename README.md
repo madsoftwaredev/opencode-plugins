@@ -249,6 +249,32 @@ Configure npm Trusted Publishing for **each package** with GitHub organization
 and direct `npm publish` enabled. Trusted Publishing requires Node.js 22.14.0+
 and npm 11.5.1+ on the runner.
 
+After `npm login`, npm 11.15.0+ can configure an existing package from the CLI:
+
+```sh
+npm trust list @madsoftwaredev/opencode-chat-title
+npm trust github @madsoftwaredev/opencode-chat-title \
+  --repo madsoftwaredev/opencode-plugins --file release.yml --allow-publish
+```
+
+Repeat for each new package. Inspect existing configurations before adding or
+replacing one; do not revoke a working publisher. A new trust configuration must
+complete its first successful publish within **two days**, or it expires and
+must be recreated. npm requires the package to exist before trust can be configured,
+so the one-time authenticated first release described above is still required.
+
+If a release reports `ENEEDAUTH`, verify those npm-side settings rather than
+adding a long-lived token to GitHub. Once authorization is repaired, rerun the
+failed job. To retry an immutable tag using the current release workflow:
+
+```sh
+gh workflow run release.yml --ref main -f tag=chat-title@0.1.2
+```
+
+The workflow checks out that exact existing tag and verifies its manifest version.
+Never move a release tag to recover a failed publish. New fixes get a new version
+and tag; the publisher skips versions that are already live.
+
 </details>
 
 ## License
