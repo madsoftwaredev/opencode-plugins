@@ -1,6 +1,6 @@
 {
   "name": "@madsoftwaredev/opencode-compaction-fold",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "OpenCode V2 TUI plugin that folds only generated compaction summaries into clickable inline rows.",
   "keywords": ["opencode", "opencode-plugin", "compaction", "summary", "tui"],
   "license": "MIT",

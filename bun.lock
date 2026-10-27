@@ -43,7 +43,7 @@
     },
     "packages/chat-title": {
       "name": "@madsoftwaredev/opencode-chat-title",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "dependencies": {
         "@opencode/plugin": "^2.1.0",
       },
@@ -61,7 +61,7 @@
     },
     "packages/compaction-fold": {
       "name": "@madsoftwaredev/opencode-compaction-fold",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "dependencies": {
         "@opencode/plugin": "^2.1.0",
       },
@@ -112,7 +112,7 @@
     },
     "packages/sidebar-resize": {
       "name": "@madsoftwaredev/opencode-sidebar-resize",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "dependencies": {
         "@opencode/plugin": "^2.1.0",
       },
@@ -154,7 +154,7 @@
     },
     "packages/usage": {
       "name": "@madsoftwaredev/opencode-usage",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@opencode/plugin": "^2.0.27",
       },

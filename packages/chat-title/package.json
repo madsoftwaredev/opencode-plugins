@@ -1,6 +1,6 @@
 {
   "name": "@madsoftwaredev/opencode-chat-title",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "OpenCode V2 TUI plugin that shows the session title above the transcript while the sidebar is hidden.",
   "keywords": [
     "opencode",

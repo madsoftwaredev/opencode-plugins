@@ -1,6 +1,6 @@
 {
   "name": "@madsoftwaredev/opencode-sidebar-resize",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "OpenCode V2 TUI plugin for resizing the existing session sidebar by dragging or command.",
   "keywords": [
     "opencode",
