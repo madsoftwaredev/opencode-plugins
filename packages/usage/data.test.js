@@ -433,3 +433,35 @@ test("refresh failures keep last known usage, and successful resync clears stale
   assert.equal(fresh.warnings.length, 0);
   tracker.dispose();
 });
+
+test("a report-build failure degrades to a warning and leaves the tracker usable", async () => {
+  // A negative cost trips buildReport's invalid-recorded-usage guard.
+  // Previously that throw escaped emit(): the final drained publish never
+  // arrived (the UI sat at loading forever), and once a run's family was
+  // loaded the throw also left drain's running flag stuck true,
+  // short-circuiting every later refresh on the same run. Before the fix
+  // the first await below never settles; after it, the degraded publish
+  // arrives and resync() recovers on the SAME run.
+  const broken = { ...session("broken"), cost: -1 };
+  const api = client([broken, session("main")]);
+  const { tracker, ready } = observer(api);
+  const degraded = ready();
+  tracker.select("broken", false);
+  const bad = await degraded;
+  assert.equal(bad.loading, false);
+  assert.equal(bad.report, undefined);
+  assert.ok(bad.warnings.some((warning) => /report/i.test(warning)));
+  // Recovery must be exercised on the SAME run; a fresh select() would hide
+  // the wedge, since a brand-new run always starts with running=false.
+  api.session.get = async ({ sessionID }) => {
+    const saved = sessionID === "broken" ? session("broken") : undefined;
+    if (!saved) throw new Error("not found");
+    return saved;
+  };
+  const recovered = ready();
+  tracker.resync();
+  const good = await recovered;
+  assert.equal(good.report.total.tokens.input, 10);
+  assert.equal(good.warnings.length, 0);
+  tracker.dispose();
+});

@@ -182,13 +182,26 @@ export function createUsageTracker(
 
   const emit = (run: Run) => {
     if (run !== current || run.controller.signal.aborted) return;
+    // A throw while building the report would otherwise escape through the
+    // `void drain(run)` call sites as an unhandled rejection: running would
+    // never reset, every later refresh would short-circuit on it, and the
+    // UI would show a permanent, silent loading state. Degrade to a warning
+    // and keep the tracker usable instead.
+    let report: UsageReport | undefined;
+    let reportWarning: string | undefined;
+    try {
+      report = run.family ? buildReport(run.family.sessions, run.histories, run.prices) : undefined;
+    } catch (error) {
+      console.warn("[opencode-usage] Could not build the usage report", error);
+      reportWarning = `Could not compute the usage report (${String(error)}).`;
+    }
     publish({
       sessionID: run.sessionID,
-      report: run.family ? buildReport(run.family.sessions, run.histories, run.prices) : undefined,
+      report,
       loading: run.running,
       detailed: run.detailed,
       updatedAt: run.updatedAt,
-      warnings: [...(run.family?.warnings ?? []), ...run.errors.values()],
+      warnings: [...(run.family?.warnings ?? []), ...run.errors.values(), ...(reportWarning ? [reportWarning] : [])],
     });
   };
 
