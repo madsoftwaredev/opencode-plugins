@@ -67,13 +67,15 @@ async function mount() {
             paddingTop={1}
             paddingBottom={1}
           >
-            <box height={2}>
+            <box flexShrink={0} paddingRight={2} paddingBottom={1}>
               <text>Session title</text>
             </box>
             <scrollbox flexGrow={1} minHeight={0}>
-              <text>Existing sidebar contents</text>
+              <box flexShrink={0} gap={1} paddingRight={1}>
+                <text>Existing sidebar contents</text>
+              </box>
             </scrollbox>
-            <box height={2}>
+            <box flexShrink={0} gap={1} paddingTop={1}>
               <Show when={enabled()}>{contribution.render({ sessionID: "session" })}</Show>
             </box>
           </box>
@@ -95,7 +97,7 @@ async function mount() {
   };
 }
 
-test("the real Solid footer slot mounts the adapter and reloads a saved width", async () => {
+test("Solid footer contribution mounts in the inspected host shape and reloads a saved width", async () => {
   const view = await mount();
   expect(view.sidebar.width).toBe(60);
   expect(view.toasts).toEqual([]);

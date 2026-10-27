@@ -8,7 +8,10 @@ afterEach(() => {
   for (const cleanup of cleanups.splice(0).reverse()) cleanup();
 });
 
-async function fixture(overlay = false) {
+// Structural fixture, not a running OpenCode host. Sidebar children/padding and
+// pane width follow packages/tui/src/routes/session/sidebar.tsx and
+// packages/tui/src/component/session-frame.tsx at 32b41bab (2.1.0-era checkout).
+async function fixture(overlay = false, beforeLayout = false) {
   const setup = await createTestRenderer({ width: 180, height: 30 });
   const { renderer } = setup;
   cleanups.push(() => renderer.destroy());
@@ -52,7 +55,7 @@ async function fixture(overlay = false) {
   session.add(transcript);
   session.add(pane);
   renderer.root.add(row);
-  await setup.renderOnce();
+  if (!beforeLayout) await setup.renderOnce();
   let preference = 60;
   const saved: number[] = [];
   const attachment = attachSidebarResize({
@@ -85,6 +88,16 @@ async function fixture(overlay = false) {
     },
   };
 }
+
+test("attaches before the first layout using OpenTUI 0.6.6 style getters", async () => {
+  const view = await fixture(false, true);
+  expect("getLayoutNode" in view.sidebar).toBe(false);
+  expect(view.sidebar.getWidth()).toEqual({ unit: Yoga.Unit.Point, value: 60 });
+  expect(view.pane.getWidth()).toEqual({ unit: Yoga.Unit.Point, value: 60 });
+  expect(view.sidebar.width).toBe(60);
+  expect(view.pane.width).toBe(60);
+  expect(view.transcript.width).toBe(88);
+});
 
 test("resizes the entire existing sidebar and its host pane without replacing sections", async () => {
   const view = await fixture();

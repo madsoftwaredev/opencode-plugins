@@ -19,6 +19,7 @@ bun build "${server_externals[@]}" packages/goal/goal-rpc.ts >/dev/null
 bun build "${tui_externals[@]}" packages/goal/tui.tsx >/dev/null
 bun build "${tui_externals[@]}" packages/chat-title/tui.tsx >/dev/null
 bun build "${tui_externals[@]}" packages/sidebar-resize/tui.tsx >/dev/null
+bun build "${tui_externals[@]}" packages/compaction-fold/tui.tsx >/dev/null
 bun build "${tui_externals[@]}" packages/usage/tui.tsx >/dev/null
 
 echo "build check ok"

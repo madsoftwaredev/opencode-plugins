@@ -1,6 +1,6 @@
 {
   "name": "@madsoftwaredev/opencode-usage",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OpenCode V2 TUI plugin for chat and subagent token usage, cache efficiency, and recorded and API-equivalent costs.",
   "keywords": [
     "opencode",

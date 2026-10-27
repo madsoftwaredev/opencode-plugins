@@ -21,8 +21,9 @@ export type UsageSession = {
   readonly title?: string;
   readonly agent?: string;
   readonly fork?: { readonly sessionID: string };
-  readonly tokens: Tokens;
-  readonly cost: number;
+  // Omitted by the server until an accounting step records usage.
+  readonly tokens?: Tokens;
+  readonly cost?: number;
 };
 
 /** Only accounting fields are retained; prompts and tool output are not cached. */
@@ -87,32 +88,34 @@ export function cacheHitRate(tokens: Tokens): number | undefined {
   return input > 0 ? tokens.cache.read / input : undefined;
 }
 
-function add(target: Metrics, source: Pick<Metrics, "tokens" | "cost"> & { api?: ApiCost }): void {
-  const values = [
-    source.cost,
-    source.tokens.input,
-    source.tokens.output,
-    source.tokens.reasoning,
-    source.tokens.cache.read,
-    source.tokens.cache.write,
-  ];
+const ZERO_TOKENS: Tokens = { input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 } };
+
+function add(target: Metrics, source: { tokens?: Tokens; cost?: number; api?: ApiCost }): void {
+  // A session that never completed an accounting step or a step that failed
+  // before the provider recorded usage can arrive here with no tokens/cost.
+  // A wholly absent tokens object or cost (null/undefined only — NaN still
+  // trips the guard below) folds in as zero: nothing recorded is nothing
+  // spent. A TypeError here would be fatal — see the emit() guard in data.ts.
+  const tokens = source.tokens ?? ZERO_TOKENS;
+  const cost = source.cost ?? 0;
+  const values = [cost, tokens.input, tokens.output, tokens.reasoning, tokens.cache.read, tokens.cache.write];
   if (values.some((value) => !Number.isFinite(value) || value < 0)) {
     throw new TypeError("opencode-usage: invalid recorded usage");
   }
 
-  target.cost += source.cost;
+  target.cost += cost;
   if (source.api) {
     target.api.usd += source.api.usd;
     target.api.missingTokens += source.api.missingTokens;
     target.api.missingEntries += source.api.missingEntries;
   }
   target.tokens = {
-    input: target.tokens.input + source.tokens.input,
-    output: target.tokens.output + source.tokens.output,
-    reasoning: target.tokens.reasoning + source.tokens.reasoning,
+    input: target.tokens.input + tokens.input,
+    output: target.tokens.output + tokens.output,
+    reasoning: target.tokens.reasoning + tokens.reasoning,
     cache: {
-      read: target.tokens.cache.read + source.tokens.cache.read,
-      write: target.tokens.cache.write + source.tokens.cache.write,
+      read: target.tokens.cache.read + tokens.cache.read,
+      write: target.tokens.cache.write + tokens.cache.write,
     },
   };
 }
