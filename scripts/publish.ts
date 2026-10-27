@@ -129,8 +129,7 @@ async function main(): Promise<number> {
       return 0;
     }
 
-    const from = plan.publishedVersion ?? "no published version";
-    console.log(`Publishing ${pkg.name}@${pkg.version} from ${pkg.dir} (registry has ${from}).`);
+    console.log(`Publishing ${pkg.name}@${pkg.version} from ${pkg.dir} (target version is not published).`);
 
     if (options.dryRun) {
       console.log("Dry run: skipped npm publish.");
