@@ -18,7 +18,7 @@
     "url": "https://github.com/madsoftwaredev/opencode-plugins/issues"
   },
   "scripts": {
-    "test": "bun test --preload @opentui/solid/preload ./packages ./scripts",
+    "test": "bash ./scripts/test.sh",
     "test:release": "bun test ./scripts",
     "build:check": "bash ./scripts/build-check.sh",
     "check": "bun run build:check && bun run test",

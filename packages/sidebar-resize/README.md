@@ -33,7 +33,7 @@ same `sidebar-resize` plugin ID and storage keys.
 
 ## Compatibility and limitations
 
-The supported development baseline is **OpenCode 2.0.27**, **OpenTUI 0.5.17**,
+The supported development baseline is **OpenCode 2.1.0**, **OpenTUI 0.6.6**,
 and **Solid 1.9.12**. This is not a guarantee that every later OpenCode layout
 will work. The package exports `./tui` only and runs in the OpenCode terminal,
 not in the web or desktop UI. Its Node `>=22` engine metadata does not make the
@@ -42,11 +42,15 @@ TypeScript/TSX entrypoint a standalone Node program.
 OpenCode V2 has no public sidebar-width API. This plugin uses the exposed
 OpenTUI renderer and Yoga layout tree, not a browser DOM, to locate and resize
 the original sidebar and its host pane from a `sidebar.footer` slot anchor.
-The adapter was originally inspected against OpenCode 2.0.26 and requires the
+The adapter was inspected against OpenCode 2.1.0-era checkout `32b41bab` and requires the
 same padded, 42-column sidebar shape, heading, scrollbox, and footer branch.
 Unrecognized layouts are left unchanged with a warning. OpenCode updates or
 other plugins that replace the footer or alter that tree can prevent attachment.
 No installed binaries or OpenCode source files are patched.
+
+OpenTUI 0.6.6 removed `getLayoutNode()`. The adapter uses Renderable's direct
+`getWidth()`, `getPadding()`, and `getPositionType()` style getters instead;
+`getLayout()` returns computed geometry and is not a replacement for these getters.
 
 The drag fallback temporarily wraps the renderer root's `processMouseEvent`
 to catch drags whose first move jumps past the handle. Cleanup restores that
@@ -77,9 +81,31 @@ native OpenTUI test renderer with a representative sidebar tree and a fake
 plugin context to check whole-sidebar resizing, dragging, persistence success
 and failure, terminal resizing, and cleanup. A runtime-import check ensures the
 TypeScript adapter does not import UI packages at runtime. These checks do not
-prove the actual layout or plugin loader in a running OpenCode TUI. The build
+by themselves prove the actual layout or plugin loader in a running OpenCode TUI. The build
 command checks transpilation, not host integration. Development dependencies
 are not needed to load the plugin in OpenCode.
+
+### Actual-host verification
+
+On 2026-10-20, the same adapter was checked with the installed **OpenCode 2.1.0**
+binary in an isolated headless PTY at **180 × 50**, using its actual render tree.
+The local copy was auto-discovered through a controlled global `plugins` symlink,
+not an explicit CLI package entry. This verifies the adapter, not npm package loading.
+Disposable HOME/XDG directories, a private `--standalone` server and database, and a
+fake local provider endpoint were used. Sounds and notifications were disabled;
+no prompts or generations were sent and no existing user sessions changed.
+
+| Action | Sidebar width | Session pane width | Handle x |
+| --- | ---: | ---: | ---: |
+| Initial layout | 42 | 138 | 138 |
+| Dispatch `sidebar-resize.width` with `60` | 60 | 120 | 120 |
+| SGR mouse press/drag/release through the PTY | 80 | 100 | 100 |
+| Dispatch reset | 42 | 138 | 138 |
+
+Resizing the PTY from 180 to 100 columns unmounted the sidebar handle and expanded
+the session pane to 100 columns. Restoring 180 columns remounted the handle at
+x=138, with sidebar width 42 and session pane width 138.
+Physical-terminal behavior and a human-operated drag remain unverified.
 
 ## License
 

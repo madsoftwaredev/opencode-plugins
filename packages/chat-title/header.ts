@@ -18,16 +18,14 @@ export type YogaLayout = {
   getHeight(): YogaValue
 }
 
-export type Node = {
+export type Node = YogaLayout & {
   readonly isDestroyed: boolean
   readonly parent: Node | null
   readonly width: number
   getChildren(): Node[]
-  getLayoutNode(): YogaLayout
+  onSizeChange?: () => void
   add(child: unknown, index?: number): number
   destroy(): void
-  on(event: string, handler: () => void): void
-  off(event: string, handler: () => void): void
 }
 
 export type LabelNode = Node & { content: string }
@@ -67,20 +65,19 @@ function isColumn(node: Node, branch: Node, core: Core): boolean {
   if (!(children[0] instanceof core.BoxRenderable)) return false
   if (!(children[0].getChildren()[0] instanceof core.ScrollBoxRenderable)) return false
 
-  const jump = children[1].getLayoutNode()
+  const jump = children[1]
   const jumpHeight = jump.getHeight()
   if (jumpHeight.unit !== core.Yoga.Unit.Point || jumpHeight.value !== 1) return false
   if (jump.getFlexShrink() !== 0) return false
 
-  const layout = node.getLayoutNode()
-  const padding = layout.getPadding(core.Yoga.Edge.Bottom)
+  const padding = node.getPadding(core.Yoga.Edge.Bottom)
   if (padding.unit !== core.Yoga.Unit.Point || padding.value !== 1) return false
-  if (layout.getFlexGrow() !== 1) return false
+  if (node.getFlexGrow() !== 1) return false
 
   // The column sits beside the sidebar, so its own parent is a row.
   const parent = node.parent
   if (!parent) return false
-  return parent.getLayoutNode().getFlexDirection() === core.Yoga.FlexDirection.Row
+  return parent.getFlexDirection() === core.Yoga.FlexDirection.Row
 }
 
 /**
@@ -101,7 +98,13 @@ export function findSessionColumn(anchor: Node, core: Core): Node | undefined {
  * flexbox, so the header takes a row from the transcript instead of covering it.
  */
 export function attachHeader(options: AttachOptions): Attachment | undefined {
-  const column = findSessionColumn(options.anchor, options.core)
+  let column: Node | undefined
+  try {
+    column = findSessionColumn(options.anchor, options.core)
+  } catch (error) {
+    console.warn("[chat-title] Unsupported render tree; the chat title is hidden", error)
+    return undefined
+  }
   if (!column) return undefined
 
   const header = new options.core.BoxRenderable(options.renderer, {
@@ -121,8 +124,7 @@ export function attachHeader(options: AttachOptions): Attachment | undefined {
   })
   header.add(label)
   column.add(header, 0)
-  // add() marks the Yoga tree dirty and requests a frame, so the header is
-  // measured on the next pass and "resize" fires with a real width.
+  // Request a frame so native layout measures the row and invokes onSizeChange.
   options.renderer.requestRender?.()
 
   let disposed = false
@@ -138,8 +140,7 @@ export function attachHeader(options: AttachOptions): Attachment | undefined {
     label.content = next
   }
 
-  // "resize" is the event Renderable emits when Yoga gives it a new size.
-  header.on("resize", refresh)
+  header.onSizeChange = refresh
   refresh()
 
   return {
@@ -147,7 +148,7 @@ export function attachHeader(options: AttachOptions): Attachment | undefined {
     dispose() {
       if (disposed) return
       disposed = true
-      header.off("resize", refresh)
+      if (!header.isDestroyed) header.onSizeChange = undefined
       // The host detaches children without destroying them, so drop the label
       // first and then the row itself.
       if (!label.isDestroyed) label.destroy()

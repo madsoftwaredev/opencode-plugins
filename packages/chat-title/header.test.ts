@@ -18,7 +18,7 @@ class FakeNode implements Node {
   isDestroyed = false
   width = 0
   parent: FakeNode | null = null
-  handlers = new Map<string, Set<() => void>>()
+  onSizeChange?: () => void
 
   constructor(
     readonly ctx: unknown,
@@ -29,16 +29,11 @@ class FakeNode implements Node {
     return [...this.children]
   }
 
-  getLayoutNode() {
-    return {
-      getPadding: () => ({ unit: UNIT_POINT, value: this.layout.padding ?? 0 }),
-      getFlexGrow: () => this.layout.flexGrow ?? 0,
-      getFlexShrink: () => this.layout.flexShrink ?? 0,
-      getFlexDirection: () => this.layout.flexDirection ?? 0,
-      getHeight: () => ({ unit: UNIT_POINT, value: this.layout.height ?? 0 }),
-      markDirty: () => {},
-    }
-  }
+  getPadding() { return { unit: UNIT_POINT, value: this.layout.padding ?? 0 } }
+  getFlexGrow() { return this.layout.flexGrow ?? 0 }
+  getFlexShrink() { return this.layout.flexShrink ?? 0 }
+  getFlexDirection() { return this.layout.flexDirection ?? 0 }
+  getHeight() { return { unit: UNIT_POINT, value: this.layout.height ?? 0 } }
 
   add(child: FakeNode, index = this.children.length) {
     child.parent = this
@@ -56,20 +51,6 @@ class FakeNode implements Node {
     if (this.isDestroyed) return
     this.isDestroyed = true
     if (this.parent) this.parent.remove(this)
-  }
-
-  on(event: string, handler: () => void) {
-    const set = this.handlers.get(event) ?? new Set()
-    set.add(handler)
-    this.handlers.set(event, set)
-  }
-
-  off(event: string, handler: () => void) {
-    this.handlers.get(event)?.delete(handler)
-  }
-
-  emit(event: string) {
-    for (const handler of this.handlers.get(event) ?? []) handler()
   }
 }
 
@@ -171,7 +152,7 @@ test("attachHeader renders nothing until layout gives the row a width", () => {
   expect(label.content).toBe("")
 
   header.width = 40
-  header.emit("resize")
+  header.onSizeChange?.()
   expect(label.content).toBe("fix the plugin loader")
 
   attachment.dispose()
@@ -185,7 +166,7 @@ test("attachHeader refits the label on refresh and on resize", () => {
   const label = header.getChildren()[0] as FakeLabel
 
   header.width = 20
-  header.emit("resize")
+  header.onSizeChange?.()
   expect(label.content.endsWith("…")).toBe(true)
   expect(label.content.length).toBeLessThanOrEqual(20 - PADDING_X * 2)
 

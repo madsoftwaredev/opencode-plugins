@@ -19,23 +19,23 @@ function findSidebar(anchor: Renderable, core: Core): SidebarTarget | undefined 
   let branch = anchor;
   for (let node = anchor.parent; node; branch = node, node = node.parent) {
     const children = node.getChildren();
-    const layout = node.getLayoutNode();
+    // OpenTUI 0.6.6 exposes style getters on Renderable itself; getLayout()
+    // returns computed geometry, not the removed Yoga node or its style values.
     if (
       children.length !== 3 ||
       !(children[1] instanceof core.ScrollBoxRenderable) ||
       children[2] !== branch ||
-      layout.getPadding(Edge.Left).value !== 2 ||
-      layout.getPadding(Edge.Right).value !== 2 ||
-      layout.getWidth().unit !== Unit.Point ||
-      layout.getWidth().value !== DEFAULT_WIDTH
+      node.getPadding(Edge.Left).value !== 2 ||
+      node.getPadding(Edge.Right).value !== 2 ||
+      node.getWidth().unit !== Unit.Point ||
+      node.getWidth().value !== DEFAULT_WIDTH
     )
       continue;
 
     const pane = node.parent;
     if (!pane) return undefined;
-    const paneLayout = pane.getLayoutNode();
-    const width = paneLayout.getWidth();
-    const overlay = paneLayout.getPositionType() === PositionType.Absolute;
+    const width = pane.getWidth();
+    const overlay = pane.getPositionType() === PositionType.Absolute;
     if (overlay && width.unit === Unit.Percent && width.value === 100) {
       return { sidebar: node, pane, overlay: true };
     }
@@ -68,8 +68,8 @@ export function attachSidebarResize(options: {
     const next = clampWidth(width, available(), overlay);
     // Both widths are fixed by the host. Updating only the inner box would
     // overlap the transcript rather than give the whole sidebar more room.
-    if (sidebar.getLayoutNode().getWidth().value !== next) sidebar.width = next;
-    if (!overlay && pane.getLayoutNode().getWidth().value !== next) pane.width = next;
+    if (sidebar.getWidth().value !== next) sidebar.width = next;
+    if (!overlay && pane.getWidth().value !== next) pane.width = next;
   };
   const refresh = () => apply(drag?.width ?? options.width());
   const schedule = () => {

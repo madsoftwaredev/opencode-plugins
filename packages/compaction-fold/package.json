@@ -1,0 +1,36 @@
+{
+  "name": "@madsoftwaredev/opencode-compaction-fold",
+  "version": "0.1.2",
+  "description": "OpenCode V2 TUI plugin that folds only generated compaction summaries into clickable inline rows.",
+  "keywords": ["opencode", "opencode-plugin", "compaction", "summary", "tui"],
+  "license": "MIT",
+  "author": "MadSoftwareDev",
+  "type": "module",
+  "exports": { "./tui": "./tui.tsx" },
+  "files": ["tui.tsx", "fold.ts", "options.ts", "README.md", "LICENSE"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/madsoftwaredev/opencode-plugins.git",
+    "directory": "packages/compaction-fold"
+  },
+  "homepage": "https://github.com/madsoftwaredev/opencode-plugins/tree/main/packages/compaction-fold#readme",
+  "bugs": { "url": "https://github.com/madsoftwaredev/opencode-plugins/issues" },
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "bun test --preload @opentui/solid/preload",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": { "@opencode/plugin": "^2.1.0" },
+  "peerDependencies": {
+    "@opentui/core": ">=0.6.6",
+    "@opentui/solid": ">=0.6.6",
+    "solid-js": ">=1.9.12"
+  },
+  "devDependencies": {
+    "@opentui/core": "0.6.6",
+    "@opentui/solid": "0.6.6",
+    "@types/bun": "1.4.0",
+    "typescript": "5.8.2"
+  },
+  "publishConfig": { "access": "public" }
+}

@@ -1,6 +1,6 @@
 {
   "name": "@madsoftwaredev/opencode-chat-title",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "OpenCode V2 TUI plugin that shows the session title above the transcript while the sidebar is hidden.",
   "keywords": [
     "opencode",
@@ -35,19 +35,21 @@
     "node": ">=22"
   },
   "scripts": {
-    "test": "bun test",
+    "test": "bun test --preload @opentui/solid/preload",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@opencode/plugin": "^2.0.27"
+    "@opencode/plugin": "^2.1.0"
   },
   "peerDependencies": {
-    "@opentui/core": ">=0.5.17",
-    "@opentui/solid": ">=0.5.17",
+    "@opentui/core": ">=0.6.6",
+    "@opentui/solid": ">=0.6.6",
     "solid-js": ">=1.9.12"
   },
   "devDependencies": {
-    "@types/bun": "1.3.9",
+    "@opentui/core": "0.6.6",
+    "@opentui/solid": "0.6.6",
+    "@types/bun": "1.4.0",
     "typescript": "5.8.2"
   },
   "publishConfig": {
