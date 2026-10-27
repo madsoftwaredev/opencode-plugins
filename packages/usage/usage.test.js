@@ -127,3 +127,15 @@ test("popup tables retain exact counts and sidebar formatting does not imply tin
   assert.deepEqual(readOptions({ sidebar: false }), { sidebar: false, includeSubagents: true });
   assert.throws(() => readOptions({ includeSubagents: "false" }), /must be a boolean/);
 });
+
+test("sessions without recorded accounting count as zero instead of throwing", () => {
+  // Records that arrive without tokens/cost (no accounting step completed
+  // yet) must fold in as zero, not crash the report.
+  const fresh = { id: "fresh", cost: 0 };
+  const step = session("step", tokens(5, 1), 0.01, "fresh");
+  const errored = { id: "errored", type: "assistant", model, cost: 0 };
+  const histories = new Map([["step", [errored]]]);
+  const report = buildReport([fresh, step], histories);
+  assert.equal(totalTokens(report.total.tokens), 6);
+  assert.equal(report.total.cost, 0.01);
+});

@@ -43,7 +43,7 @@ The command palette also exposes both commands. `/chat-usage` aliases `/usage`.
 
 ## Accounting
 
-OpenCode's session totals are the source of truth. Total tokens are the sum of its
+OpenCode's session totals are the source of truth. Sessions that never completed an accounting step, and steps that failed before usage was recorded, carry no accounting and count as zero. Total tokens are the sum of its
 disjoint buckets: **input + output + reasoning + cache read + cache write**.
 Input means **uncached** input, and output excludes the separate reasoning bucket.
 Cache-hit rate is `cache read / (input + cache read + cache write)`; it is `—` when
