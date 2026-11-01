@@ -55,6 +55,12 @@ beforeEach(() => {
     if (!options.headers.get("x-opencode-session")) {
       return new Response("missing x-opencode-session", { status: 503 });
     }
+    if (
+      url.includes("/inference/go/") &&
+      !["Bearer TEST_ACCESS", "Bearer TEST_CONSOLE_KEY"].includes(options.headers.get("authorization"))
+    ) {
+      return new Response("legacy Go key is not a Console credential", { status: 401 });
+    }
     return responses.shift() ?? completion(summary);
   });
 });
@@ -73,15 +79,13 @@ async function setup(
   options = {},
   generate = async () => ({ text: summary }),
   providerIntegrationID = "opencode-go",
-  credentials = {
-    "opencode-go": { type: "key", key: "TEST_SECRET" },
-    opencode: { type: "oauth", access: "TEST_ACCESS" },
-  }
+  // Console-routed Go uses opencode's OAuth connection, not the legacy Go key.
+  credentials = { "opencode-go": { type: "key", key: "TEST_SECRET" }, opencode: { type: "oauth", access: "TEST_ACCESS" } }
 ) {
   let callback;
   const activeCalls = [];
   const ctx = {
-    app: { version: "2.0.9" },
+    app: { version: "2.1.0" },
     options,
     model: {
       async list() {
@@ -93,7 +97,12 @@ async function setup(
               modelID: "deepseek-v4.1-flash",
               enabled: true,
               package: "@opencode/ai/providers/openai-compatible",
-              settings: { baseURL: "https://opencode.ai/zen/go/v1" },
+              settings: {
+                baseURL: providerIntegrationID === "opencode"
+                  ? "https://opencode.ai/inference/go/openai/v1"
+                  : "https://opencode.ai/zen/go/v1",
+              },
+              headers: { "x-opencode-org-id": "test-org" },
               variants: [{ id: "max", settings: { reasoningEffort: "max" } }],
               limit: { context: 1_000_000, output: 384_000 },
             },
@@ -103,7 +112,7 @@ async function setup(
     },
     provider: {
       async get() {
-        return { data: { integrationID: providerIntegrationID } };
+        return { data: providerIntegrationID === null ? {} : { integrationID: providerIntegrationID } };
       },
     },
     integration: {
@@ -114,6 +123,7 @@ async function setup(
           return { type: "credential", id: `${integrationID}-credential` };
         },
         async resolve(connection) {
+          if (!connection) return undefined;
           return credentials[connection.id.replace(/-credential$/, "")];
         },
       },
@@ -143,6 +153,20 @@ function event(sessionID = "ses_test") {
   };
 }
 
+test("Claude Code compaction is left to its bridge instead of installing an external checkpoint", async () => {
+  const hook = await setup();
+  const input = event();
+  input.model = { providerID: "claude-code", id: "claude-opus-5-5[1m]", variant: "max" };
+  await hook(input);
+  expect(input.result).toBeUndefined();
+  expect(requests).toHaveLength(0);
+  expect(input.model).toEqual({
+    providerID: "claude-code",
+    id: "claude-opus-5-5[1m]",
+    variant: "max",
+  });
+});
+
 test("Go summary uses the originating session, configured model and variant without changing the main model", async () => {
   const hook = await setup();
   const input = event();
@@ -157,27 +181,54 @@ test("Go summary uses the originating session, configured model and variant with
   expect(requests[0].body.tools).toBeUndefined();
 });
 
-test("resolves the provider's own integration when the provider reports another one", async () => {
-  // Go can report the Console integration, whose active credential is OAuth, not a key.
+test("Console-routed Go uses the declared OAuth integration instead of the legacy Go key", async () => {
   const hook = await setup({}, async () => ({ text: summary }), "opencode");
   const input = event();
   await hook(input);
-  expect(hook.activeCalls).toEqual(["opencode-go"]);
+  expect(hook.activeCalls).toEqual(["opencode"]);
   expect(input.result.summary).toBe(summary);
-  expect(requests[0].headers.get("authorization")).toBe("Bearer TEST_SECRET");
+  expect(requests[0].url).toBe("https://opencode.ai/inference/go/openai/v1/chat/completions");
+  expect(requests[0].headers.get("authorization")).toBe("Bearer TEST_ACCESS");
+  expect(requests[0].headers.get("x-opencode-org-id")).toBe("test-org");
+  expect(requests[0].headers.get("x-opencode-session")).toBe(input.sessionID);
+  expect(requests[0].body.reasoning_effort).toBe("max");
 });
 
-test("falls back to the reported integration when the provider integration has no key", async () => {
+test("the declared integration also supports service-account keys", async () => {
   const hook = await setup(
     {},
     async () => ({ text: summary }),
     "opencode",
-    { opencode: { type: "key", key: "TEST_SECRET" } }
+    { opencode: { type: "key", key: "TEST_CONSOLE_KEY" } }
   );
   const input = event();
   await hook(input);
-  expect(hook.activeCalls).toEqual(["opencode-go", "opencode"]);
+  expect(hook.activeCalls).toEqual(["opencode"]);
   expect(input.result.summary).toBe(summary);
+  expect(requests[0].headers.get("authorization")).toBe("Bearer TEST_CONSOLE_KEY");
+});
+
+test("providers without an integration ID use their own integration", async () => {
+  const hook = await setup({}, async () => ({ text: summary }), null);
+  const input = event();
+  await hook(input);
+  expect(hook.activeCalls).toEqual(["opencode-go"]);
+  expect(input.result.summary).toBe(summary);
+});
+
+test("a missing Console connection never borrows the unrelated legacy Go key", async () => {
+  const hook = await setup(
+    {},
+    async () => ({ text: summary }),
+    "opencode",
+    { "opencode-go": { type: "key", key: "TEST_SECRET" } }
+  );
+  const input = event();
+  await hook(input);
+  expect(hook.activeCalls).toEqual(["opencode"]);
+  expect(input.result).toBeUndefined();
+  expect(requests).toHaveLength(0);
+  expect(warning.mock.calls.flat().join(" ")).toContain("Connect the integration serving");
 });
 
 test("long transcripts retain the middle and attachment descriptors", async () => {
@@ -223,6 +274,23 @@ test("provider rejection warns about fallback without logging its body or creden
   const diagnostics = await readFile(join(logRoot, "opencode/log/compaction-model.log"), "utf8");
   expect(diagnostics).toContain("HTTP 503");
   expect(diagnostics).not.toContain("TEST_SECRET");
+});
+
+test("a rejected Console OAuth request falls back without leaking the access token", async () => {
+  const hook = await setup({}, async () => ({ text: summary }), "opencode");
+  responses.push(new Response("TEST_ACCESS private transcript", { status: 401 }));
+  const input = event();
+  await hook(input);
+  expect(input.result).toBeUndefined();
+  expect(requests).toHaveLength(1);
+  expect(requests[0].headers.get("authorization")).toBe("Bearer TEST_ACCESS");
+  const log = warning.mock.calls.flat().join(" ");
+  expect(log).toContain("HTTP 401");
+  expect(log).toContain("Falling back");
+  expect(log).not.toContain("TEST_ACCESS");
+  expect(log).not.toContain("private transcript");
+  const diagnostics = await readFile(join(logRoot, "opencode/log/compaction-model.log"), "utf8");
+  expect(diagnostics).not.toContain("TEST_ACCESS");
 });
 
 test("invalid headings trigger one retry with the original transcript", async () => {

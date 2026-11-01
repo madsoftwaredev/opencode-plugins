@@ -1,11 +1,24 @@
 # @madsoftwaredev/opencode-compaction-model
 
 Summarizes local checkpoint compaction with a dedicated model and variant while
-the session keeps its selected working model.
+the session keeps its selected working model, except for the `claude-code` provider.
 
 ```sh
 opencode plugin add @madsoftwaredev/opencode-compaction-model
 ```
+
+## Claude Code compatibility
+
+Claude Code sessions use the bridge's normal summary request instead of this plugin.
+In `@openchamber/opencode-claude` 1.3.4, that request stops the parked Claude turn and
+clears its resume binding before generating a one-shot Haiku summary. The next working
+request starts a fresh Claude session from OpenCode's checkpoint and recent context.
+
+Installing an external summary through `event.result` bypasses that reset: OpenCode
+can report a completed compaction while the Claude bridge continues reading its old,
+full history. This plugin therefore leaves `result` unset for `claude-code`, regardless
+of the configured summarizer. Other providers, including native `anthropic`, keep
+using the configured summarizer. No stored transcript is deleted.
 
 ## Choose the compaction model
 
@@ -43,20 +56,24 @@ exceeding it logs a fallback rather than silently deleting the middle of the his
 
 ## Why the Go adapter exists
 
-In OpenCode 2.0.8–2.0.9, `ctx.generate.text()` makes a stateless request without
-`x-opencode-session`. OpenCode Go rejects that request. The plugin's Go adapter
+In OpenCode 2.0.8–2.0.9, `ctx.generate.text()` made a stateless request without
+`x-opencode-session`, which Go rejected. The plugin's Go adapter
 uses the existing OpenCode connection, catalog endpoint, model ID, and variant,
 and sends the **originating session ID** to the chat-completions endpoint. It does
-not store an API key or change the session's model. Other providers use the native
+not store a credential or change the session's model. Other providers use the native
 `ctx.generate.text()` API.
 
-Starting with `0.1.2`, credential lookup checks the model's own provider integration
-first, then the integration ID reported by the provider, accepting only API-key
-credentials. OpenCode Go can report the Console integration, whose active connection
-may be OAuth rather than the Go API key. Earlier releases used only that reported
-integration, causing compaction to fall back even when a Go key was connected.
-The fix does not embed connection IDs, keys, or endpoint URLs; it uses the selected
-model and runtime provider metadata.
+Starting with `0.1.3`, credential lookup follows the provider's **declared integration
+ID**, defaulting to the provider ID only when no integration ID is declared. Both API
+keys and resolved OAuth access tokens are supported; OpenCode owns OAuth refresh.
+
+In the inspected OpenCode 2.1.0 configuration, Console discovery routes Go to
+`https://opencode.ai/inference/go/openai/v1` through the `opencode` integration,
+with an organization header. The old adapter instead preferred a legacy
+`opencode-go` API key and ignored OAuth, sending the wrong credential to that
+endpoint. The adapter now keeps the discovered endpoint, headers, and integration
+together, matching OpenCode's model resolver. It never borrows a different
+integration's credential when the declared connection is missing.
 
 The Go adapter currently supports models using
 `@opencode/ai/providers/openai-compatible` (including the default DeepSeek model).
@@ -104,10 +121,11 @@ From the repository root:
 bun test ./packages/compaction-model/index.test.js
 ```
 
-The regression suite covers Go session routing, provider/integration mismatches and
-credential fallback, concurrent sessions, variant selection, long-history preservation,
-invalid/truncated results, and logged fallback. A live scratch
-session using Muse was manually compacted with DeepSeek and its checkpoint metadata verified.
+The regression suite covers Claude Code delegation, Go session routing, Console OAuth
+and service-account credentials, concurrent sessions, variant selection, long-history
+preservation, invalid/truncated results, and logged fallback. The credential fix was
+checked against the running 2.1.0 server's provider, integration, and model metadata
+using authenticated read-only API calls; no paid generation was run for this fix.
 
 References: [V2 plugin hooks](https://opencode.ai/v2/docs/build/plugins/),
 [V2 compaction](https://opencode.ai/v2/docs/compaction/).

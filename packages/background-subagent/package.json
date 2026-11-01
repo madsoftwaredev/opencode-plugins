@@ -1,7 +1,7 @@
 {
   "name": "@madsoftwaredev/opencode-background-subagent",
-  "version": "0.1.2",
-  "description": "OpenCode V2 plugin that makes omitted subagent.background calls run in the background.",
+  "version": "0.2.0",
+  "description": "OpenCode V2 plugin that defaults subagents to background execution and highlights their activity above the prompt.",
   "keywords": [
     "opencode",
     "opencode-plugin",
@@ -12,10 +12,13 @@
   "author": "MadSoftwareDev",
   "type": "module",
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./tui": "./tui.tsx"
   },
   "files": [
     "index.ts",
+    "tui.tsx",
+    "activity.ts",
     "README.md",
     "LICENSE"
   ],
@@ -31,8 +34,21 @@
   "engines": {
     "node": ">=22"
   },
+  "scripts": {
+    "test": "bun test --preload @opentui/solid/preload",
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
-    "@opencode/plugin": "^2.0.12"
+    "@opencode/plugin": "^2.0.27"
+  },
+  "peerDependencies": {
+    "@opentui/core": ">=0.5.17",
+    "@opentui/solid": ">=0.5.17",
+    "solid-js": ">=1.9.12"
+  },
+  "devDependencies": {
+    "@types/bun": "1.3.9",
+    "typescript": "5.8.2"
   },
   "publishConfig": {
     "access": "public"

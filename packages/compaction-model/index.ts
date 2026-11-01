@@ -139,6 +139,10 @@ export default {
     await ctx.session.hook("compaction", async (event) => {
       if (event.result) return;
 
+      // Claude Code must see the summary request to stop its parked turn and clear
+      // the full-history resume binding. An external checkpoint skips that reset.
+      if (event.model.providerID === "claude-code") return;
+
       const generate = async (prompt: string): Promise<string> => {
         if (model.providerID === "opencode-go") {
           return generateGoSummary(ctx, model, event.sessionID, prompt);

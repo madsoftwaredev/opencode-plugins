@@ -6,7 +6,7 @@ type ModelRef = { providerID: string; id: string; variant?: string };
 /** Only these controlled messages are safe to include in the diagnostic log. */
 export class CompactionError extends Error {}
 
-/** Go requires the real session ID; the V2 stateless generate API omits it. */
+/** Keep Go requests attributed to the originating session, unlike stateless generation. */
 export async function generateGoSummary(
   ctx: Context,
   model: ModelRef,
@@ -31,27 +31,24 @@ export async function generateGoSummary(
   if (typeof settings.baseURL !== "string")
     throw new CompactionError("Go endpoint is unavailable.");
 
-  // Go can report the Console integration, whose active connection is unrelated.
-  // Prefer the model's own integration and use the reported one only as a fallback.
+  // Console discovery can route Go through its own endpoint and OAuth connection.
+  // Follow that endpoint's integration, just like OpenCode's model resolver; the
+  // legacy opencode-go key is not interchangeable with the Console credential.
   const provider = await ctx.provider.get({ providerID: model.providerID });
-  const candidates = [model.providerID, provider.data.integrationID].filter(
-    (id, index, all): id is string => typeof id === "string" && all.indexOf(id) === index
-  );
-  let credential: { key: string } | undefined;
-  for (const integrationID of candidates) {
-    const connection = await ctx.integration.connection.active(integrationID);
-    const resolved = connection
-      ? await ctx.integration.connection.resolve(connection)
+  const integrationID = provider.data.integrationID ?? model.providerID;
+  const connection = await ctx.integration.connection.active(integrationID);
+  const credential = connection
+    ? await ctx.integration.connection.resolve(connection)
+    : undefined;
+  const token = credential?.type === "key"
+    ? credential.key
+    : credential?.type === "oauth"
+      ? credential.access
       : undefined;
-    if (resolved?.type === "key") {
-      credential = resolved;
-      break;
-    }
-  }
-  if (!credential) throw new CompactionError("Connect an OpenCode Go API key first.");
+  if (!token) throw new CompactionError("Connect the integration serving the Go compaction model first.");
 
   const headers = new Headers({ ...selected.headers, ...variant?.headers });
-  headers.set("authorization", `Bearer ${credential.key}`);
+  headers.set("authorization", `Bearer ${token}`);
   headers.set("content-type", "application/json");
   headers.set("user-agent", `opencode/${ctx.app.version}`);
   headers.set("x-opencode-session", sessionID);
