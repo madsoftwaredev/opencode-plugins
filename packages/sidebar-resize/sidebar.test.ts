@@ -104,7 +104,8 @@ test("resizes the entire existing sidebar and its host pane without replacing se
   expect(view.sidebar.width).toBe(60);
   expect(view.pane.width).toBe(60);
   expect(view.transcript.width).toBe(88);
-  expect(view.section.parent).toBe(view.content.content);
+  // OpenTUI 0.8 reports the ScrollBox itself, not its content part, as the parent.
+  expect(view.section.parent).toBe(view.content);
   view.setWidth(72);
   await view.renderOnce();
   expect(view.sidebar.width).toBe(72);

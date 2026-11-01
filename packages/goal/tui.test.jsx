@@ -1,6 +1,7 @@
 /** @jsxImportSource @opentui/solid */
 
 import { afterEach, expect, test } from "bun:test";
+import { RGBA } from "@opentui/core";
 import { createTestRenderer } from "@opentui/core/testing";
 import { render } from "@opentui/solid";
 import plugin from "./tui";
@@ -34,9 +35,10 @@ function makeContext({ views = {} } = {}) {
         return () => {};
       },
     },
+    // Host theme tokens are RGBA values; OpenTUI 0.8 rejects plain numbers.
     theme: {
-      text: { base: 0xffffff, muted: 0x888888 },
-      background: { raised: { base: 0x222222 } },
+      text: { base: RGBA.fromHex("#ffffff"), muted: RGBA.fromHex("#888888") },
+      background: { raised: { base: RGBA.fromHex("#222222") } },
     },
     ui: {
       slot: (claim) => {

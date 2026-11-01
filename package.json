@@ -25,11 +25,11 @@
     "release:plan": "bun scripts/publish.ts"
   },
   "devDependencies": {
-    "@opencode/plugin": "^2.0.27",
-    "@opencode/theme": "2.0.28",
-    "@opentui/core": "^0.5.17",
-    "@opentui/solid": "^0.5.17",
-    "solid-js": "1.9.12",
+    "@opencode/plugin": "^2.2.5",
+    "@opencode/theme": "2.2.5",
+    "@opentui/core": "0.8.1",
+    "@opentui/solid": "0.8.1",
+    "solid-js": "1.9.16",
     "typescript": "^5.8.0"
   }
 }
