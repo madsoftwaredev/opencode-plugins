@@ -97,6 +97,9 @@ async function publish(pkg: Target, options: { provenance: boolean }): Promise<v
 
   const proc = Bun.spawn(["npm", ...args], {
     cwd: pkg.dir,
+    // A local first release needs the terminal for npm's browser 2FA prompt;
+    // without stdin, npm fails with EOTP instead. CI uses OIDC and ignores it.
+    stdin: "inherit",
     stdout: "inherit",
     stderr: "inherit",
   });
