@@ -11,6 +11,7 @@ import {
   type SubagentSession,
   type SubagentStatus,
 } from "./subagent-view"
+import { resolveOptions, sidebarSessions, type SidebarOptions } from "./options"
 
 const MAX_VISIBLE_SUBAGENTS = 8
 const MAX_EXPANDED_HEIGHT = 16
@@ -77,13 +78,30 @@ function SubagentRow(props: { context: Context; session: SubagentSession }) {
   )
 }
 
-function SidebarSubagents(props: { context: Context; sessionID: string; syncState: SyncState }) {
+function SidebarSubagents(props: {
+  context: Context
+  sessionID: string
+  syncState: SyncState
+  options: SidebarOptions
+}) {
   const { context } = props
   const [expanded, setExpanded] = createSignal(false)
   const [moreHovered, setMoreHovered] = createSignal(false)
   const [collapseHovered, setCollapseHovered] = createSignal(false)
+  const statusOf = (session: SubagentSession): SubagentStatus =>
+    subagentStatus(
+      context.data.session.get(session.id) ?? session,
+      context.data.session.status(session.id),
+    )
+  const updatedOf = (session: SubagentSession): number =>
+    (context.data.session.get(session.id) ?? session).time.updated
   const sessions = createMemo(() =>
-    descendantSessions(context.data.session.list(), props.sessionID),
+    sidebarSessions(
+      descendantSessions(context.data.session.list(), props.sessionID),
+      props.options,
+      statusOf,
+      updatedOf,
+    ),
   )
   const displayedSessions = createMemo(() =>
     expanded() ? sessions() : sessions().slice(0, MAX_VISIBLE_SUBAGENTS),
@@ -208,6 +226,7 @@ function syncChildren(context: Context, sessionID: string, state: SyncState): vo
 export default Plugin.define({
   id: "subagent-sidebar",
   setup(context) {
+    const options = resolveOptions(context.options)
     let disposed = false
     const syncState: SyncState = {
       children: new Set(),
@@ -230,7 +249,12 @@ export default Plugin.define({
     const unregister = context.ui.slot({
       prepend: "sidebar.content",
       render: ({ sessionID }) => (
-        <SidebarSubagents context={context} sessionID={sessionID} syncState={syncState} />
+        <SidebarSubagents
+          context={context}
+          sessionID={sessionID}
+          syncState={syncState}
+          options={options}
+        />
       ),
     })
 
